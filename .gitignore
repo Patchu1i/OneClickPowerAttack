@@ -1,0 +1,6 @@
+# build
+build/
+[Bb][Uu][Il][Ll][Dd]/
+.vs*/
+CMakeFiles/
+

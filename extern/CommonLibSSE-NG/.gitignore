@@ -1,0 +1,30 @@
+# dot folders
+.vs/
+.vscode/
+.xmake/
+
+# folders
+build*/
+out/
+
+# files
+*.zip
+CMakeUserPresets.json
+CMakeFiles
+CMakeCache.txt
+*.cmake
+.DS_Store
+vcpkg*
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+/out*
+/.vs*
+/.idea
+conan.lock
+conanbuildinfo.*
+conaninfo.txt
+graph_info.json
