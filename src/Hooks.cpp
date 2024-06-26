@@ -12,6 +12,7 @@ namespace OCPA
 		// Register PlayerCharacter for animation events.
 		void AnimEvent::RegisterActor(RE::Actor* a_actor)
 		{
+			logger::info("Player Registered for Animation Events.");
 			if (!a_actor || a_actor->IsDead()) {
 				return;
 			}
@@ -46,6 +47,12 @@ namespace OCPA
 		void HookAttackBlockHandler::ProcessButton(RE::ButtonEvent* a_event, void* a_data)
 		{
 			FnProcessButton fn = fnHash.at(*(uintptr_t*)this);
+
+			// TODO: Lazy load player registration.
+			if (!AnimEvent::GetSingleton()->IsPlayerRegistered) {
+				AnimEvent::GetSingleton()->RegisterActor(RE::PlayerCharacter::GetSingleton());
+				AnimEvent::GetSingleton()->IsPlayerRegistered = true;
+			}
 
 			auto main = Main::GetSingleton();
 			if (main->IsAttackEvent(a_event)) {

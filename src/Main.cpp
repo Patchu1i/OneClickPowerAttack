@@ -13,11 +13,6 @@ namespace OCPA
 		controlMap = RE::ControlMap::GetSingleton();
 		menu = RE::UI::GetSingleton();
 		config = Settings::GetSingleton()->GetConfig();
-
-		if (!OCPA::Hooks::AnimEvent::GetSingleton()->IsPlayerRegistered) {
-			OCPA::Hooks::AnimEvent::GetSingleton()->RegisterActor(player);
-			OCPA::Hooks::AnimEvent::GetSingleton()->IsPlayerRegistered = true;
-		}
 	}
 
 	bool Main::IsPAQueued()
@@ -177,6 +172,10 @@ namespace OCPA
 	// E) The player is using a valid weapon
 	bool Main::IsAttackEvent(RE::ButtonEvent* a_event)
 	{
+		if (config->onlyDuringAttack == true && !isAttacking) {
+			return false;
+		}
+
 		// Check keycode against current bindings.
 		if (!Utility::IsNormalAttack(a_event) && !Utility::IsPowerAttack(a_event)) {
 			return false;
@@ -258,8 +257,13 @@ namespace OCPA
 			return true;  // early out
 		}
 
+		RE::ATTACK_STATE_ENUM currentState = (player->AsActorState()->actorState1.meleeAttackState);
+		if (currentState == RE::ATTACK_STATE_ENUM::kBash) {
+			return true;
+		}
+
 		if (isBlockKey) {
-			if (config->disableBlockDuringAttack && isAttacking) {
+			if (config->disableBlockDuringAttack == true && isAttacking) {
 				return false;
 			}
 		}
