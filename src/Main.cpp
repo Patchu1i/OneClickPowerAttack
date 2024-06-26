@@ -80,6 +80,7 @@ namespace OCPA
 		a_actor->GetGraphVariableBool("IsBlocking", isBlocking);
 
 		if (isJumping || isBlocking) {
+			logger::info("IsBlocking in PowerAttack");
 			PerformAction(actionRightAttack, a_actor);
 			std::thread thread(&Main::AltPowerAttack, Main::GetSingleton(), a_actor);
 			thread.detach();
@@ -282,7 +283,7 @@ namespace OCPA
 			player->NotifyAnimationGraph("attackRelease");
 		}
 
-		if (isAttackKey) {
+		if (Utility::IsNormalAttack(a_event)) {
 			switch (config->longPressMode) {
 			case Settings::LongPressMode::kVanilla:  // 0
 				if (a_event->IsHeld() && a_event->HeldDuration() >= fInitialPowerAttackDelay->GetFloat()) {
@@ -301,9 +302,9 @@ namespace OCPA
 				}
 				break;
 			case Settings::LongPressMode::kRepeat:  // 2
-				if (a_event->IsHeld() && !isAttacking) {
+				if (a_event->IsDown() && !isAttacking) {
 					Attack(player);
-				} else if (a_event->IsHeld() && attackWindow) {
+				} else if (a_event->IsHeld() && isAttacking) {
 					Attack(player);
 				}
 				break;
