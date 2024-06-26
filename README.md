@@ -1,8 +1,8 @@
-# Test
+# One Click Power Attack NG - Fixed
 
-# CommonLibSSE-NG Plugin Template
+## What this is:
 
-Template for building SKSE plugins using the NG branch of CommonLibVR.  
+This code is derived from the One Click Power Attack - NG [source](https://github.com/jarari/OneClickPowerAttack), and restructured and fitted to [alandtse's](https://github.com/alandtse/CommonLibVR/tree/ng) fork of CommonLibSSE-NG. In addition, I made some logical changes to address issues with blocking, and bash behavior to fix outstanding bugs in the original source. 
 
 ## Requirements
 
@@ -18,36 +18,11 @@ Template for building SKSE plugins using the NG branch of CommonLibVR.
   - Install vcpkg using the directions in vcpkg's [Quick Start Guide](https://github.com/microsoft/vcpkg#quick-start-windows)
   - After install, add a new environment variable named `VCPKG_ROOT` with the value as the path to the folder containing vcpkg
 
-## User Requirements
-
-- [Address Library for SKSE](https://www.nexusmods.com/skyrimspecialedition/mods/32444)
-  - Needed for SSE/AE
-- [VR Address Library for SKSEVR](https://www.nexusmods.com/skyrimspecialedition/mods/58101)
-  - Needed for VR
-
-## Register Visual Studio as a Generator
-
-- Open `x64 Native Tools Command Prompt`
-- Run `cmake`
-- Close the cmd window
-
 ## Clone and Build
-Open terminal (e.g., PowerShell) and run the following commands:
+- Clone this repository
+- Open project in Visual Studio Code (or Studio)
+- Run CMAKE configuration "ALL"
+- Build
 
-```
-git clone https://github.com/ponzipyramid/CommonLibSSE-NG-Template.git --recursive
-cd CommonLibSSE-NG-Template
-.\BuildRelease.bat
-```
+(note): The git submodule should automatically init and update recursively on CMake update. If it fails, you'll have to do it manually.
 
-### CMAKE Options (optional)
-If you want an example CMakeUserPreset to start off with you can copy the `CMakeUserPresets.json.template` -> `CMakeUserPresets.json`
-#### AUTO_PLUGIN_DEPLOYMENT
-* This option is default `"OFF"`
-* Make sure `"AUTO_PLUGIN_DEPLOYMENT"` is set to `"ON"` in `CMakeUserPresets.json`
-* Change the `"SamplePluginOutputDir"` value to match your desired outputs, if you want multiple folders you can separate them by `;` is shown in the template example
-
-When using custom preset you can call BuildRelease.bat with an parameter to specify which preset to configure eg:
-`.\BuildRelease.bat ALL-WITH-AUTO-DEPLOYMENT`
-
-When switching between different presets you might need to remove the build folder
