@@ -80,7 +80,6 @@ namespace OCPA
 		a_actor->GetGraphVariableBool("IsBlocking", isBlocking);
 
 		if (isJumping || isBlocking) {
-			logger::info("IsBlocking in PowerAttack");
 			PerformAction(actionRightAttack, a_actor);
 			std::thread thread(&Main::AltPowerAttack, Main::GetSingleton(), a_actor);
 			thread.detach();
@@ -344,17 +343,6 @@ namespace OCPA
 				bool wantPowerAttack = false;
 				bool wantDualPowerAttack = false;
 
-				// bool isBlockKey = config->blockKey[b_event->device.get()] == keyCode;
-
-				// if (auto ply = RE::PlayerCharacter::GetSingleton()) {
-				// 	if (isBlockKey && b_event->IsUp()) {
-				// 		ply->NotifyAnimationGraph("MCO_EndAnimation");
-				// 		ply->NotifyAnimationGraph("blockStop");
-				// 		logger::info("blockStop");
-				// 		return;
-				// 	}
-				// }
-
 				if (keyCode == (uint32_t)config->modifierKey && b_event->IsDown()) {
 					keyComboPressed = true;
 				}
@@ -395,7 +383,7 @@ namespace OCPA
 				// Repeat for dual wield
 				if (keyCode == (uint32_t)config->dualPaKey && b_event->IsDown()) {
 					if (isAttacking && config->onlyDuringAttack || config->onlyDuringAttack == false) {
-						if (config->modifierKey >= 2) {
+						if (config->dualModifierKey >= 2) {
 							if (config->onlyFirstAttack) {
 								if (isAttacking) {
 									wantDualPowerAttack = true;  // Allow without keyCombo
