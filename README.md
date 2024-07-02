@@ -19,10 +19,14 @@ This code is derived from the One Click Power Attack - NG [source](https://githu
   - After install, add a new environment variable named `VCPKG_ROOT` with the value as the path to the folder containing vcpkg
 
 ## Clone and Build
+### Debug
 - Clone this repository
 - Open project in Visual Studio Code (or Studio)
 - Run CMAKE configuration "ALL"
 - Build
+### Release
+- Clone this repository
+- Run `.\BuildRelease.bat` from VS 2022 Native Command Prompt
 
 (note): The git submodule should automatically init and update recursively on CMake update. If it fails, you'll have to do it manually.
 
