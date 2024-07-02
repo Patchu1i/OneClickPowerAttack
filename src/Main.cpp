@@ -395,7 +395,7 @@ namespace OCPA
 				// Repeat for dual wield
 				if (keyCode == (uint32_t)config->dualPaKey && b_event->IsDown()) {
 					if (isAttacking && config->onlyDuringAttack || config->onlyDuringAttack == false) {
-						if (config->modifierKey >= 2) {
+						if (config->dualModifierKey >= 2) {
 							if (config->onlyFirstAttack) {
 								if (isAttacking) {
 									wantDualPowerAttack = true;  // Allow without keyCombo
