@@ -389,11 +389,11 @@ namespace OCPA
 									wantDualPowerAttack = true;  // Allow without keyCombo
 								}
 
-								if (!isAttacking && keyComboPressed) {  // Require keyCombo
+								if (!isAttacking && dualKeyComboPressed) {  // Require keyCombo
 									wantDualPowerAttack = true;
 								}
 							} else {
-								if (keyComboPressed) {
+								if (dualKeyComboPressed) {
 									wantDualPowerAttack = true;
 								}
 							}
