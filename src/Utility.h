@@ -50,13 +50,38 @@ namespace OCPA
 			return keyCode;
 		}
 
-		static inline bool IsPowerAttack(RE::ButtonEvent* a_event)
+		// Only called from mouse input (AttackBlockHandler)
+		// Input handler deciphers if the key is a power attack or not.
+		static inline bool IsPowerAttack(RE::ButtonEvent* a_event, bool& keyComboPressed, bool& isAttacking)
 		{
 			auto* config = Settings::GetSingleton()->GetConfig();
 			uint32_t keyCode = GetKeycode(a_event);
 
 			if (keyCode == (uint32_t)config->paKey) {
-				return true;
+				logger::info("Test");
+				if (config->modifierKey >= 2) {
+					if (config->onlyFirstAttack) {
+						logger::info("onlyFirstAttack");
+						if (isAttacking) {
+							logger::info("1");
+							return true;  // Power attack without modifier
+						} else if (keyComboPressed) {
+							logger::info("2");
+							return true;  // Not attacking, require modifier
+						} else {
+							logger::info("3");
+							return false;  // Above conditions not met, abort.
+						}
+					}
+
+					if (keyComboPressed) {
+						return true;  // If we set modifier, require keyComboPressed
+					} else {
+						return false;  // modifier not pressed, abort.
+					}
+				} else {
+					return true;  // No modifier set, key is direct power attack.
+				}
 			}
 
 			return false;
@@ -69,9 +94,11 @@ namespace OCPA
 			uint32_t attackKey = config->attackKey[a_event->device.get()];
 
 			if (keyCode == attackKey) {
+				logger::info("IsNormalAttack = True");
 				return true;
 			}
 
+			logger::info("IsNormalAttack = false");
 			return false;
 		};
 

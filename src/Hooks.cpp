@@ -2,6 +2,7 @@
 #include "Keycode.h"
 #include "Main.h"
 #include "Settings.h"
+#include "Utility.h"
 
 namespace OCPA
 {
@@ -46,8 +47,6 @@ namespace OCPA
 		// Events not considered attack or block are passed to the original handler.
 		void HookAttackBlockHandler::ProcessButton(RE::ButtonEvent* a_event, void* a_data)
 		{
-			FnProcessButton fn = fnHash.at(*(uintptr_t*)this);
-
 			// TODO: Lazy load player registration.
 			if (!AnimEvent::GetSingleton()->IsPlayerRegistered) {
 				AnimEvent::GetSingleton()->RegisterActor(RE::PlayerCharacter::GetSingleton());
@@ -55,12 +54,35 @@ namespace OCPA
 			}
 
 			auto main = Main::GetSingleton();
-			if (main->IsAttackEvent(a_event)) {
-				main->ProcessAttackEvent(a_event, a_data);
-			} else if (main->ProcessBlockEvent(a_event, a_data)) {
-				if (fn) {
-					(this->*fn)(a_event, a_data);
+			auto config = Settings::GetSingleton()->GetConfig();
+
+			auto isBlockKey = config->blockKey[a_event->device.get()];
+			auto keyCode = Utility::GetKeycode(a_event->AsButtonEvent());
+
+			if (keyCode == isBlockKey && config->disableBlockDuringAttack) {
+				if (auto player = RE::PlayerCharacter::GetSingleton()) {
+					RE::ATTACK_STATE_ENUM state = player->AsActorState()->actorState1.meleeAttackState;
+					if (state > RE::ATTACK_STATE_ENUM::kNone && state < RE::ATTACK_STATE_ENUM::kBash) {
+						return;
+					}
 				}
+
+				// * Cause of bash block bug. *
+				// if (config->disableBlockDuringAttack && main->isAttacking) {
+				// 	return;
+				// }
+			}
+
+			if (main->IsAttackEvent(a_event)) {
+				if (!main->ProcessAttackEvent(a_event, a_data)) {
+					return;
+				}
+			}
+
+			FnProcessButton fn = fnHash.at(*(uintptr_t*)this);
+
+			if (fn) {
+				(this->*fn)(a_event, a_data);
 			}
 		}
 

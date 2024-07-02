@@ -177,8 +177,11 @@ namespace OCPA
 			return false;
 		}
 
+		bool normalAttack = Utility::IsNormalAttack(a_event);
+		bool powerAttack = Utility::IsPowerAttack(a_event, keyComboPressed, isAttacking);
+
 		// Check keycode against current bindings.
-		if (!Utility::IsNormalAttack(a_event) && !Utility::IsPowerAttack(a_event)) {
+		if (!normalAttack && !powerAttack) {
 			return false;
 		}
 
@@ -249,8 +252,6 @@ namespace OCPA
 	{
 		(void)a_data;
 
-		bool isBlockKey = config->blockKey[a_event->device.get()];
-
 		bool isBlocking = false;
 		player->GetGraphVariableBool("IsBlocking", isBlocking);
 
@@ -260,9 +261,12 @@ namespace OCPA
 
 		RE::ATTACK_STATE_ENUM currentState = (player->AsActorState()->actorState1.meleeAttackState);
 		if (currentState == RE::ATTACK_STATE_ENUM::kBash) {
-			return true;
+			return true;  // early out
+		} else if (currentState == RE::ATTACK_STATE_ENUM::kHit) {
+			return true;  // MCO recovery fires here.
 		}
 
+		bool isBlockKey = config->blockKey[a_event->device.get()];
 		if (isBlockKey) {
 			if (config->disableBlockDuringAttack == true && isAttacking) {
 				return false;
@@ -272,7 +276,7 @@ namespace OCPA
 		return true;
 	}
 
-	void Main::ProcessAttackEvent(RE::ButtonEvent* a_event, void* a_data)
+	bool Main::ProcessAttackEvent(RE::ButtonEvent* a_event, void* a_data)
 	{
 		(void)a_data;
 
@@ -294,7 +298,7 @@ namespace OCPA
 				break;
 			case Settings::LongPressMode::kDisable:  // 1
 				if (a_event->heldDownSecs >= fInitialPowerAttackDelay->GetFloat()) {
-					return;
+					return false;
 				}
 
 				if (a_event->IsDown()) {
@@ -315,6 +319,8 @@ namespace OCPA
 				break;
 			}
 		}
+
+		return true;
 	}
 
 	// This function is responsible for handling alternative power attack keybinds
@@ -322,9 +328,7 @@ namespace OCPA
 	// We do this outside of AttackBlockHandler to handle power attacks as a "post condition".
 	void Main::ReceiveInputEvents(const InputEvents* a_events, RE::BSTEventSource<InputEvents>* a_source)
 	{
-		(void)a_events;
 		(void)a_source;
-		// (void)a_source;
 
 		if (!CanPowerAttack()) {
 			return;
@@ -340,6 +344,17 @@ namespace OCPA
 				bool wantPowerAttack = false;
 				bool wantDualPowerAttack = false;
 
+				// bool isBlockKey = config->blockKey[b_event->device.get()] == keyCode;
+
+				// if (auto ply = RE::PlayerCharacter::GetSingleton()) {
+				// 	if (isBlockKey && b_event->IsUp()) {
+				// 		ply->NotifyAnimationGraph("MCO_EndAnimation");
+				// 		ply->NotifyAnimationGraph("blockStop");
+				// 		logger::info("blockStop");
+				// 		return;
+				// 	}
+				// }
+
 				if (keyCode == (uint32_t)config->modifierKey && b_event->IsDown()) {
 					keyComboPressed = true;
 				}
@@ -353,12 +368,16 @@ namespace OCPA
 				if (keyCode == (uint32_t)config->paKey && b_event->IsDown()) {
 					if (isAttacking && config->onlyDuringAttack || config->onlyDuringAttack == false) {
 						if (config->modifierKey >= 2) {
-							if (keyComboPressed) {
-								if (config->onlyFirstAttack) {
-									if (isAttacking) {
-										wantPowerAttack = true;
-									}
-								} else {
+							if (config->onlyFirstAttack) {
+								if (isAttacking) {
+									wantPowerAttack = true;  // Allow without keyCombo
+								}
+
+								if (!isAttacking && keyComboPressed) {  // Require keyCombo
+									wantPowerAttack = true;
+								}
+							} else {
+								if (keyComboPressed) {
 									wantPowerAttack = true;
 								}
 							}
@@ -376,13 +395,17 @@ namespace OCPA
 				// Repeat for dual wield
 				if (keyCode == (uint32_t)config->dualPaKey && b_event->IsDown()) {
 					if (isAttacking && config->onlyDuringAttack || config->onlyDuringAttack == false) {
-						if (config->dualModifierKey >= 2) {
-							if (dualKeyComboPressed) {
-								if (config->onlyFirstAttack) {
-									if (isAttacking) {
-										wantDualPowerAttack = true;
-									}
-								} else {
+						if (config->modifierKey >= 2) {
+							if (config->onlyFirstAttack) {
+								if (isAttacking) {
+									wantDualPowerAttack = true;  // Allow without keyCombo
+								}
+
+								if (!isAttacking && keyComboPressed) {  // Require keyCombo
+									wantDualPowerAttack = true;
+								}
+							} else {
+								if (keyComboPressed) {
 									wantDualPowerAttack = true;
 								}
 							}

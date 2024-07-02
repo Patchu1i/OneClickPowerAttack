@@ -23,7 +23,7 @@ namespace OCPA
 
 		void ReceiveAnimEvent(const RE::BSAnimationGraphEvent* a_event, RE::BSTEventSource<RE::BSAnimationGraphEvent>* a_source);
 		void ReceiveInputEvents(const InputEvents* a_events, RE::BSTEventSource<InputEvents>* a_source);
-		void ProcessAttackEvent(RE::ButtonEvent* a_event, void* a_data);
+		bool ProcessAttackEvent(RE::ButtonEvent* a_event, void* a_data);
 		bool ProcessBlockEvent(RE::ButtonEvent* a_event, void* a_data);
 
 		static inline Main* GetSingleton()
@@ -34,7 +34,6 @@ namespace OCPA
 
 		void Load();
 
-	private:
 		bool sendEvent = false;
 
 		// Saved Globals
