@@ -53,6 +53,18 @@ namespace OCPA
 				AnimEvent::GetSingleton()->IsPlayerRegistered = true;
 			}
 
+			// If player is in first person, pass all events to the original handler.
+			if (auto player = RE::PlayerCharacter::GetSingleton()) {
+				if (!player->Is3rdPersonVisible()) {
+					FnProcessButton fn = fnHash.at(*(uintptr_t*)this);
+
+					if (fn) {
+						(this->*fn)(a_event, a_data);
+						return;
+					}
+				}
+			}
+
 			auto main = Main::GetSingleton();
 			auto config = Settings::GetSingleton()->GetConfig();
 
@@ -66,11 +78,6 @@ namespace OCPA
 						return;
 					}
 				}
-
-				// * Cause of bash block bug. *
-				// if (config->disableBlockDuringAttack && main->isAttacking) {
-				// 	return;
-				// }
 			}
 
 			if (main->IsAttackEvent(a_event)) {
