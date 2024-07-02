@@ -142,6 +142,10 @@ namespace OCPA
 			return false;
 		}
 
+		if (!player->Is3rdPersonVisible()) {
+			return false;
+		}
+
 		uint32_t controlFlag = (uint32_t)RE::UserEvents::USER_EVENT_FLAG::kMovement &
 		                       (uint32_t)RE::UserEvents::USER_EVENT_FLAG::kLooking;
 
