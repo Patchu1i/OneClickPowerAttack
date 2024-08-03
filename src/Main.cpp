@@ -79,6 +79,16 @@ namespace OCPA
 		bool isBlocking = false;
 		a_actor->GetGraphVariableBool("IsBlocking", isBlocking);
 
+		std::string race = player->GetRace()->fullName.c_str();
+
+		// Prevent power attack spam.
+		if (race == "Vampire Lord" || race == "Werewolf") {
+			RE::ATTACK_STATE_ENUM currentAnimState = (a_actor->AsActorState()->actorState1.meleeAttackState);
+			if (currentAnimState != RE::ATTACK_STATE_ENUM::kNone) {
+				return;
+			}
+		}
+
 		if (isJumping || isBlocking) {
 			PerformAction(actionRightAttack, a_actor);
 			std::thread thread(&Main::AltPowerAttack, Main::GetSingleton(), a_actor);
@@ -111,6 +121,13 @@ namespace OCPA
 			isAttacking = true;
 		} else {
 			isAttacking = false;
+		}
+
+		// Capture HitFrame events to flag when repeated attacks are listened for.
+		if (a_event->tag == "HitFrame") {
+			hitWindow = true;
+		} else {
+			hitWindow = false;
 		}
 
 		// MCO Specific implementation to flag attack window for succession.
@@ -185,6 +202,12 @@ namespace OCPA
 
 		// Check keycode against current bindings.
 		if (!normalAttack && !powerAttack) {
+			return false;
+		}
+
+		std::string race = player->GetRace()->fullName.c_str();
+
+		if (race == "Vampire Lord" || race == "Werewolf") {
 			return false;
 		}
 
@@ -290,6 +313,9 @@ namespace OCPA
 			player->NotifyAnimationGraph("attackRelease");
 		}
 
+		bool inHitFrame = false;
+		player->GetGraphVariableBool("HitFrame", inHitFrame);
+
 		if (Utility::IsNormalAttack(a_event)) {
 			switch (config->longPressMode) {
 			case Settings::LongPressMode::kVanilla:  // 0
@@ -303,17 +329,14 @@ namespace OCPA
 				if (a_event->heldDownSecs >= fInitialPowerAttackDelay->GetFloat()) {
 					return false;
 				}
-
-				if (a_event->IsDown()) {
-					Attack(player);
-				}
 				break;
 			case Settings::LongPressMode::kRepeat:  // 2
-				if (a_event->IsDown() && !isAttacking) {
+				if (a_event->IsHeld() && hitWindow) {
 					Attack(player);
-				} else if (a_event->IsHeld() && isAttacking) {
+				} else if (a_event->IsDown()) {
 					Attack(player);
 				}
+				return false;
 				break;
 			default:  // kDisable
 				if (a_event->IsDown()) {
