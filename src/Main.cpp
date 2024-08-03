@@ -123,12 +123,7 @@ namespace OCPA
 			isAttacking = false;
 		}
 
-		// if (currentAnimState == RE::ATTACK_STATE_ENUM::kSwing || currentAnimState == RE::ATTACK_STATE_ENUM::kHit) {
-		// 	hitWindow = true;
-		// } else {
-		// 	hitWindow = false;
-		// }
-
+		// Capture HitFrame events to flag when repeated attacks are listened for.
 		if (a_event->tag == "HitFrame") {
 			hitWindow = true;
 		} else {
