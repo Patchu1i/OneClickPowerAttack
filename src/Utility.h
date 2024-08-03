@@ -58,18 +58,13 @@ namespace OCPA
 			uint32_t keyCode = GetKeycode(a_event);
 
 			if (keyCode == (uint32_t)config->paKey) {
-				logger::info("Test");
 				if (config->modifierKey >= 2) {
 					if (config->onlyFirstAttack) {
-						logger::info("onlyFirstAttack");
 						if (isAttacking) {
-							logger::info("1");
 							return true;  // Power attack without modifier
 						} else if (keyComboPressed) {
-							logger::info("2");
 							return true;  // Not attacking, require modifier
 						} else {
-							logger::info("3");
 							return false;  // Above conditions not met, abort.
 						}
 					}
@@ -94,11 +89,9 @@ namespace OCPA
 			uint32_t attackKey = config->attackKey[a_event->device.get()];
 
 			if (keyCode == attackKey) {
-				logger::info("IsNormalAttack = True");
 				return true;
 			}
 
-			logger::info("IsNormalAttack = false");
 			return false;
 		};
 

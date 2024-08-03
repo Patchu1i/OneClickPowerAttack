@@ -44,6 +44,7 @@ namespace OCPA
 
 		// State & Timers
 		bool attackWindow = false;
+		bool hitWindow = false;
 		bool isAttacking = false;
 		float paQueueTime = 0.f;
 		float queuePAExpire = 0.2f;  // ?
